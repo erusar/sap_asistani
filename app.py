@@ -12,13 +12,39 @@ from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-# --- SAYFA VE ARAYÜZ AYARLARI ---
+# --- SAYFA VE ARAYÜZ AYARLARI (EN ÜSTTE OLMALIDIR) ---
 st.set_page_config(
     page_title="SAP & Makina İkmal Asistanı",
     page_icon="🚜",
     layout="wide"
 )
 
+# --- 8 HANELİ GÜVENLİK ŞİFRE PANELİ ---
+def check_password():
+    if "password_correct" not in st.session_state:
+        st.session_state["password_correct"] = False
+
+    if not st.session_state["password_correct"]:
+        st.subheader("🔒 SAP & Makina İkmal Asistanı Girişi")
+        st.info("Bu sistem yetkisiz erişimlere karşı korumalıdır. Lütfen operatör şifrenizi girin.")
+        
+        user_password = st.text_input("8 Haneli Giriş Şifreniz:", type="password", max_chars=8)
+        
+        if st.button("Giriş Yap", use_container_width=True):
+            if user_password == "79800721":  # <--- 8 HANELİ ÖZEL ŞİFRENİZ HERE
+                st.session_state["password_correct"] = True
+                st.success("✅ Şifre Doğrulandı! Sistem yükleniyor...")
+                st.rerun()
+            else:
+                st.error("❌ Hatalı Şifre! Lütfen 8 haneli geçerli şifreyi girin.")
+        return False
+    return True
+
+# Şifre doğru değilse uygulamanın geri kalanını yüklemeyi durdur
+if not check_password():
+    st.stop()
+
+# --- KLASÖR YOLU ---
 DOKUMANLAR_KLASORU = os.path.join(os.getcwd(), "dokumanlar")
 
 # --- YARDIMCI FONKSİYON: E-POSTA GÖNDERİCİ (SMTP) ---
